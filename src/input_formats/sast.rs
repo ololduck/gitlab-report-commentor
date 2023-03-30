@@ -1,4 +1,3 @@
-use askama::Template;
 use chrono::NaiveDateTime;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
@@ -103,9 +102,13 @@ struct Scan {
 impl Default for Scan {
     fn default() -> Self {
         Self {
+            analyzer: Default::default(),
+            scanner: Default::default(),
             scan_type: "unspecified".to_string(),
+            start_time: Default::default(),
+            end_time: Default::default(),
             status: "unspecified".to_string(),
-            ..Default::default()
+            
         }
     }
 }
@@ -125,8 +128,8 @@ impl Default for Software {
             id: "unspecified".to_string(),
             name: "unspecified".to_string(),
             url: "unspecified".to_string(),
+            vendor: Default::default(),
             version: "unspecified".to_string(),
-            ..Default::default()
         }
     }
 }
