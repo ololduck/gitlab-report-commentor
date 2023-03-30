@@ -3,6 +3,7 @@ use std::io;
 use std::io::Read;
 
 mod input_formats;
+mod poster;
 
 use crate::input_formats::sast::SastHandler;
 use crate::input_formats::Handlers;
@@ -19,7 +20,7 @@ struct Args {
 
 fn render_to_comment(handler: Handlers, raw_doc: &str) -> String {
     match handler {
-        Handlers::Sast => SastHandler::render_to_markdown(&SastHandler::parse_to_struct(&raw_doc)),
+        Handlers::Sast => SastHandler::render_to_markdown(&SastHandler::parse_to_struct(raw_doc)),
     }
 }
 
@@ -35,4 +36,6 @@ fn main() {
     let comment = render_to_comment(args.handler, &raw_doc);
     println!("{}", comment);
     // then upload as gitlab MR comment if we can find the appropriate envvars
+    poster::post_to_merge_request(&comment)
+        .expect("Could not post. Maybe you are missing some envvars?");
 }
