@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 
 pub mod sast;
@@ -37,12 +36,4 @@ use clap::ValueEnum;
 #[derive(ValueEnum, Clone)]
 pub enum Handlers {
     Sast,
-}
-
-impl Handlers {
-    pub fn get_handler(&self) -> impl ReportFormatHandler {
-        match self {
-            Handlers::Sast => sast::SastHandler,
-        }
-    }
 }

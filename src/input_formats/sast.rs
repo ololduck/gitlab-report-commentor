@@ -1,19 +1,13 @@
-use askama::Template;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
+use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 
 use super::{ReportFormatHandler, Severity};
 
-const DEFAULT_NAME: &str = "<unnamed>";
-
 pub struct SastHandler;
 
-#[derive(Template)]
-#[template(path = "sast/vulnerability_report.md.j2")]
-struct VulnerabilityReportTemplate<'a> {
-    vulnerabilities: &'a Vec<Vulnerability>,
-    scan: &'a Scan,
-}
+const VULNERABILITY_REPORT_TEMPLATE: &str =
+    include_str!("../../templates/sast/vulnerability_report.md.hbs");
 
 impl ReportFormatHandler for SastHandler {
     type ReportFormat = SastReport;
@@ -22,11 +16,13 @@ impl ReportFormatHandler for SastHandler {
     }
 
     fn render_to_markdown(doc: &Self::ReportFormat) -> String {
-        let report = VulnerabilityReportTemplate {
-            vulnerabilities: &doc.vulnerabilities,
-            scan: &doc.scan,
-        };
-        report.render().unwrap()
+        let mut hbs = Handlebars::new();
+        hbs.register_template_string(
+            "VULNERABILITY_REPORT_TEMPLATE",
+            VULNERABILITY_REPORT_TEMPLATE,
+        )
+        .unwrap();
+        hbs.render("VULNERABILITY_REPORT_TEMPLATE", &doc).unwrap()
     }
 }
 
@@ -34,35 +30,49 @@ impl ReportFormatHandler for SastHandler {
 pub struct SastReport {
     version: String,
     vulnerabilities: Vec<Vulnerability>,
+    #[serde(default)]
     dependency_files: Vec<()>,
-    scan: Scan,
+    scan: Option<Scan>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 struct Vulnerability {
-    id: String,
+    id: Option<String>,
     category: String,
     #[serde(default)]
     name: String,
     message: String,
     description: String,
+    #[serde(default)]
     cve: String,
+    #[serde(default)]
     severity: Severity,
+    #[serde(default)]
     scanner: VulnerabilityScanner,
+    #[serde(default)]
     location: VulnerabilityLocation,
+    #[serde(default)]
     identifiers: Vec<VulnerabilityIdentifier>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug)]
 struct VulnerabilityScanner {
     id: String,
     name: String,
 }
+impl Default for VulnerabilityScanner {
+    fn default() -> Self {
+        Self {
+            id: "unspecified".to_string(),
+            name: "unspecified".to_string(),
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 struct VulnerabilityLocation {
-    file: String,
-    start_line: u32,
+    file: Option<String>,
+    start_line: Option<u32>,
     end_line: Option<u32>,
 }
 
@@ -72,29 +82,65 @@ struct VulnerabilityIdentifier {
     vulnerability_type: String,
     name: String,
     value: String,
+    url: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug)]
 struct Scan {
+    #[serde(default)]
     analyzer: Software,
+    #[serde(default)]
     scanner: Software,
     #[serde(rename = "type")]
     scan_type: String,
+    #[serde(default)]
     start_time: NaiveDateTime,
+    #[serde(default)]
     end_time: NaiveDateTime,
     status: String,
 }
+impl Default for Scan {
+    fn default() -> Self {
+        Self {
+            analyzer: Default::default(),
+            scanner: Default::default(),
+            scan_type: "unspecified".to_string(),
+            start_time: Default::default(),
+            end_time: Default::default(),
+            status: "unspecified".to_string(),
+        }
+    }
+}
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug)]
 struct Software {
     id: String,
     name: String,
     url: String,
+    #[serde(default)]
     vendor: SoftwareVendor,
     version: String,
 }
+impl Default for Software {
+    fn default() -> Self {
+        Self {
+            id: "unspecified".to_string(),
+            name: "unspecified".to_string(),
+            url: "unspecified".to_string(),
+            vendor: Default::default(),
+            version: "unspecified".to_string(),
+        }
+    }
+}
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug)]
 struct SoftwareVendor {
     name: String,
+}
+impl Default for SoftwareVendor {
+    fn default() -> Self {
+        Self {
+            name: "unspecified".to_string(),
+        }
+    }
 }
