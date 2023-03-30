@@ -108,7 +108,6 @@ impl Default for Scan {
             start_time: Default::default(),
             end_time: Default::default(),
             status: "unspecified".to_string(),
-            
         }
     }
 }
