@@ -18,6 +18,7 @@ struct Args {
     dry_run: bool,
 }
 
+/// Takes a given handler, matches it with i
 fn render_to_comment(handler: Handlers, raw_doc: &str) -> String {
     match handler {
         Handlers::Sast => SastHandler::render_to_markdown(&SastHandler::parse_to_struct(raw_doc)),

@@ -398,7 +398,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "gl-report-mr-poster"
+name = "gitlab-report-commentator"
 version = "0.1.0+alpha.0"
 dependencies = [
  "askama",
