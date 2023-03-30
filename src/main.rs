@@ -14,7 +14,7 @@ use crate::input_formats::ReportFormatHandler;
 struct Args {
     #[arg(short = 't', long = "type", value_enum)]
     handler: Handlers,
-    #[arg(short, long)]
+    #[arg(short, long, help="don't try to actually post the message, just parse the report.")]
     dry_run: bool,
 }
 
@@ -37,6 +37,8 @@ fn main() {
     let comment = render_to_comment(args.handler, &raw_doc);
     println!("{}", comment);
     // then upload as gitlab MR comment if we can find the appropriate envvars
-    poster::post_to_merge_request(&comment)
-        .expect("Could not post. Maybe you are missing some envvars?");
+    if !args.dry_run {
+        poster::post_to_merge_request(&comment)
+            .expect("Could not post. Maybe you are missing some envvars?");
+    }
 }

@@ -1,17 +1,14 @@
 use askama::Template;
 use chrono::NaiveDateTime;
+use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 
 use super::{ReportFormatHandler, Severity};
 
 pub struct SastHandler;
 
-#[derive(Template)]
-#[template(path = "sast/vulnerability_report.md.j2")]
-struct VulnerabilityReportTemplate<'a> {
-    vulnerabilities: &'a Vec<Vulnerability>,
-    scan: &'a Scan,
-}
+const VULNERABILITY_REPORT_TEMPLATE: &str = include_str!("../../templates/sast/vulnerability_report.md.hbs");
+
 
 impl ReportFormatHandler for SastHandler {
     type ReportFormat = SastReport;
@@ -20,11 +17,9 @@ impl ReportFormatHandler for SastHandler {
     }
 
     fn render_to_markdown(doc: &Self::ReportFormat) -> String {
-        let report = VulnerabilityReportTemplate {
-            vulnerabilities: &doc.vulnerabilities,
-            scan: &doc.scan,
-        };
-        report.render().unwrap()
+        let mut hbs = Handlebars::new();
+        hbs.register_template_string("VULNERABILITY_REPORT_TEMPLATE", VULNERABILITY_REPORT_TEMPLATE).unwrap();
+        hbs.render("VULNERABILITY_REPORT_TEMPLATE", &doc).unwrap()
     }
 }
 
@@ -34,18 +29,18 @@ pub struct SastReport {
     vulnerabilities: Vec<Vulnerability>,
     #[serde(default)]
     dependency_files: Vec<()>,
-    #[serde(default)]
-    scan: Scan,
+    scan: Option<Scan>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 struct Vulnerability {
-    id: String,
+    id: Option<String>,
     category: String,
     #[serde(default)]
     name: String,
     message: String,
     description: String,
+    #[serde(default)]
     cve: String,
     #[serde(default)]
     severity: Severity,
@@ -71,40 +66,20 @@ impl Default for VulnerabilityScanner {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 struct VulnerabilityLocation {
-    file: String,
-    start_line: u32,
+    file: Option<String>,
+    start_line: Option<u32>,
     end_line: Option<u32>,
 }
 
-impl Default for VulnerabilityLocation {
-    fn default() -> Self {
-        Self {
-            file: "unspecified".to_string(),
-            start_line: 1,
-            end_line: None
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 struct VulnerabilityIdentifier {
     #[serde(rename = "type")]
     vulnerability_type: String,
     name: String,
     value: String,
     url: String,
-}
-impl Default for VulnerabilityIdentifier {
-    fn default() -> Self {
-        Self {
-            vulnerability_type: "unspecified".to_string(),
-            name: "unspecified".to_string(),
-            value: "unspecified".to_string(),
-            url: "unspecified".to_string()
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
