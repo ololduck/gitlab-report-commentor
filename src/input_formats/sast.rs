@@ -1,10 +1,8 @@
 use askama::Template;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 use super::{ReportFormatHandler, Severity};
-
-const DEFAULT_NAME: &str = "<unnamed>";
 
 pub struct SastHandler;
 
