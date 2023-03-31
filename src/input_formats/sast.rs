@@ -82,7 +82,8 @@ struct VulnerabilityIdentifier {
     vulnerability_type: String,
     name: String,
     value: String,
-    url: String,
+    #[serde(default)]
+    url: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
