@@ -1,6 +1,19 @@
-on: [push, pull_request]
-
 name: Continuous integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CARGO_TERM_VERBOSE: 'true'
 
 jobs:
   check:
@@ -94,3 +107,10 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
+
+  semver:
+    steps:
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v1
+        with:
+          crate-target: --bin gitlab-report-commentor
