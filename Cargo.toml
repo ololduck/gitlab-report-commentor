@@ -1,6 +1,6 @@
 [package]
 name = "gitlab-report-commentator"
-version = "0.1.0+alpha.0"
+version = "0.1.0+alpha.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,4 +11,9 @@ serde = { version = "1.0.159", features = ["derive"] }
 serde_json = "1.0.95"
 chrono = { version = "0.4.24", features = ["serde"] }
 handlebars = "4.3.6"
-reqwest = { version = "0.11.16", features = ["blocking", "json"] }
+
+[target.'cfg(target_env="musl")'.dependencies]
+reqwest = { version = "0.11.16",default-features=false, features = ["blocking", "json", "rustls-tls"]}
+[target.'cfg(not(target_env= "musl"))'.dependencies]
+reqwest = { version = "0.11.16", features = ["blocking", "json"]}
+
