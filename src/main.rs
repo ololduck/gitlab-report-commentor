@@ -14,7 +14,11 @@ use crate::input_formats::ReportFormatHandler;
 struct Args {
     #[arg(short = 't', long = "type", value_enum)]
     handler: Handlers,
-    #[arg(short, long, help="don't try to actually post the message, just parse the report.")]
+    #[arg(
+        short,
+        long,
+        help = "don't try to actually post the message, just parse the report."
+    )]
     dry_run: bool,
 }
 

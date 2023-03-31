@@ -7,8 +7,8 @@ use super::{ReportFormatHandler, Severity};
 
 pub struct SastHandler;
 
-const VULNERABILITY_REPORT_TEMPLATE: &str = include_str!("../../templates/sast/vulnerability_report.md.hbs");
-
+const VULNERABILITY_REPORT_TEMPLATE: &str =
+    include_str!("../../templates/sast/vulnerability_report.md.hbs");
 
 impl ReportFormatHandler for SastHandler {
     type ReportFormat = SastReport;
@@ -18,7 +18,11 @@ impl ReportFormatHandler for SastHandler {
 
     fn render_to_markdown(doc: &Self::ReportFormat) -> String {
         let mut hbs = Handlebars::new();
-        hbs.register_template_string("VULNERABILITY_REPORT_TEMPLATE", VULNERABILITY_REPORT_TEMPLATE).unwrap();
+        hbs.register_template_string(
+            "VULNERABILITY_REPORT_TEMPLATE",
+            VULNERABILITY_REPORT_TEMPLATE,
+        )
+        .unwrap();
         hbs.render("VULNERABILITY_REPORT_TEMPLATE", &doc).unwrap()
     }
 }
@@ -61,7 +65,7 @@ impl Default for VulnerabilityScanner {
     fn default() -> Self {
         Self {
             id: "unspecified".to_string(),
-            name: "unspecified".to_string()
+            name: "unspecified".to_string(),
         }
     }
 }
@@ -133,6 +137,8 @@ struct SoftwareVendor {
 }
 impl Default for SoftwareVendor {
     fn default() -> Self {
-        Self {name:"unspecified".to_string()}
+        Self {
+            name: "unspecified".to_string(),
+        }
     }
 }

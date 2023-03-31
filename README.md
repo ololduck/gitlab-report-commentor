@@ -24,13 +24,13 @@ sast:
     - chmod +x gitlab-report-commentator
   variables:
     # you need to specify in the secrets. This token _must_ have the api permission.
-    GITLAB_USER_TOKEN: $GITLAB_USER_TOKEN 
+    GITLAB_USER_TOKEN: $GITLAB_USER_TOKEN
   script:
     # Run your analyzer. (if you use gitlab sast, you will need to run a job with the sast run as a dependency/need and get its artifacts
     - cargo audit --json > audit.json
     # another nifty piece of software https://lib.rs/crates/gitlab-report
     - gitlab-report -p audit < audit.json > sast.json
-    # Finally, convert the sast report to a markdown comment. 
+    # Finally, convert the sast report to a markdown comment.
     # We will attempt to post it to the merge request's comments (aka "notes")
     - gitlab-report-commentator -t sast < sast.json
 ```
