@@ -1,10 +1,10 @@
+use log::error;
 use std::collections::HashMap;
 use std::env;
 use std::process::exit;
-use log::error;
 
-use reqwest::blocking::Client;
 use crate::BAD_CONFIG;
+use reqwest::blocking::Client;
 
 pub fn post_to_merge_request(comment: &str) -> Result<(), failure::Error> {
     let Ok(base_url) = env::var("CI_API_V4_URL") else {

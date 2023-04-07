@@ -1,12 +1,12 @@
 use clap::Parser;
+use exitfailure::ExitFailure;
+use human_panic::setup_panic;
+use log::{debug, error, info, warn};
+use pretty_env_logger;
+use pretty_env_logger::env_logger::Builder;
 use std::io;
 use std::io::Read;
 use std::process::exit;
-use exitfailure::ExitFailure;
-use human_panic::{setup_panic};
-use pretty_env_logger;
-use pretty_env_logger::env_logger::Builder;
-use log::{debug, error, info, warn};
 
 mod input_formats;
 mod poster;
@@ -24,9 +24,9 @@ struct Args {
     #[arg(short = 't', long = "type", value_enum)]
     handler: Handlers,
     #[arg(
-    short,
-    long,
-    help = "don't try to actually post the message, just parse the report."
+        short,
+        long,
+        help = "don't try to actually post the message, just parse the report."
     )]
     dry_run: bool,
 }
@@ -41,14 +41,16 @@ fn render_to_comment(handler: Handlers, raw_doc: &str) -> String {
     s
 }
 
-
 fn main() -> Result<(), ExitFailure> {
     setup_panic!();
-    Builder::from_env("LOG_LEVEL").format_level(true).format_module_path(false).format_timestamp(None).init();
+    Builder::from_env("LOG_LEVEL")
+        .format_level(true)
+        .format_module_path(false)
+        .format_timestamp(None)
+        .init();
     let args = Args::parse();
     let mut raw_doc = String::new();
-    let raw_doc_len = match io::stdin()
-        .read_to_string(&mut raw_doc) {
+    let raw_doc_len = match io::stdin().read_to_string(&mut raw_doc) {
         Ok(size) => size,
         Err(e) => {
             error!("Could not read from stdin: {}", e);
