@@ -29,8 +29,10 @@ pub trait ReportFormatHandler {
     type ReportFormat;
     fn parse_to_struct(s: &str) -> Self::ReportFormat;
     fn render_to_markdown(doc: &Self::ReportFormat) -> String;
+    fn render_to_diff_line_comments(doc: &Self::ReportFormat) -> Vec<DiffLineComment>;
 }
 
+use crate::poster::DiffLineComment;
 use clap::ValueEnum;
 
 #[derive(ValueEnum, Clone)]
