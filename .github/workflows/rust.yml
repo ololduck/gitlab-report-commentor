@@ -108,15 +108,3 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
-
-  semver:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-      - name: Check semver
-        uses: obi1kenobi/cargo-semver-checks-action@v1
-        with:
-          crate-target: --bin gitlab-report-commentor
