@@ -123,10 +123,12 @@ pub fn post_to_diff(comments: &[DiffLineComment]) -> Result<(), failure::Error> 
         .header("PRIVATE-TOKEN", &gitlab_token)
         .send()?;
     let resp_object: Vec<MergeRequestVersion> = resp.json()?;
-    let last_version = resp_object.first().ok_or(failure::err_msg(format!(
-        "Could not find a valid Merge Request version! Here's what I got from gitlab: {:?}",
-        &resp_object
-    )))?;
+    let last_version = resp_object.first().ok_or_else(|| {
+        failure::err_msg(format!(
+            "Could not find a valid Merge Request version! Here's what I got from gitlab: {:?}",
+            &resp_object
+        ))
+    })?;
     for diff_comment in comments
         .iter()
         .filter(|comment| mr_changed_paths.contains(&comment.path))
