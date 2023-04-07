@@ -47,6 +47,7 @@ sast:
 ```
 
 If you're using gitlab SAST, it's even simpler:
+
 ```yaml
 include:
   - template: Security/SAST.gitlab-ci.yml
