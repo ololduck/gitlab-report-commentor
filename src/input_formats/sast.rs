@@ -1,5 +1,7 @@
+use crate::poster::DiffLineComment;
 use chrono::NaiveDateTime;
 use handlebars::Handlebars;
+use log::warn;
 use serde::{Deserialize, Serialize};
 
 use super::{ReportFormatHandler, Severity};
@@ -23,6 +25,38 @@ impl ReportFormatHandler for SastHandler {
         )
         .unwrap();
         hbs.render("VULNERABILITY_REPORT_TEMPLATE", &doc).unwrap()
+    }
+
+    fn render_to_diff_line_comments(doc: &Self::ReportFormat) -> Vec<DiffLineComment> {
+        let mut res = Vec::new();
+        for vuln in &doc.vulnerabilities {
+            let Some(path) = &vuln.location.file else {
+                warn!("Vulnerability {:?} has no valid file path. Omiting it from the generated report.", &vuln);
+                continue;
+            };
+            let Some(line) = vuln.location.start_line else {
+                warn!("Vulnerability {:?} has no valid start_line. Omiting it from the genrated report", &vuln);
+                continue;
+            };
+            let body = format!(
+                r##"# {severity} - {name}
+            Scanner {scanner_name} has found the following:
+            {msg}
+
+            {desc}"##,
+                severity = vuln.severity,
+                name = vuln.name,
+                scanner_name = vuln.scanner.name,
+                msg = vuln.message,
+                desc = vuln.description
+            );
+            res.push(DiffLineComment {
+                path: path.clone(),
+                line: line.to_string(),
+                body,
+            })
+        }
+        res
     }
 }
 
@@ -60,6 +94,7 @@ struct VulnerabilityScanner {
     id: String,
     name: String,
 }
+
 impl Default for VulnerabilityScanner {
     fn default() -> Self {
         Self {
@@ -100,6 +135,7 @@ struct Scan {
     end_time: NaiveDateTime,
     status: String,
 }
+
 impl Default for Scan {
     fn default() -> Self {
         Self {
@@ -122,6 +158,7 @@ struct Software {
     vendor: SoftwareVendor,
     version: String,
 }
+
 impl Default for Software {
     fn default() -> Self {
         Self {
@@ -138,6 +175,7 @@ impl Default for Software {
 struct SoftwareVendor {
     name: String,
 }
+
 impl Default for SoftwareVendor {
     fn default() -> Self {
         Self {

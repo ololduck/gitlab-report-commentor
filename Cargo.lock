@@ -514,7 +514,7 @@ checksum = "ad0a93d233ebf96623465aad4046a8d3aa4da22d4f4beba5388838c8a434bbb4"
 
 [[package]]
 name = "gitlab-report-commentator"
-version = "0.1.0+alpha.2"
+version = "0.1.0+alpha.3"
 dependencies = [
  "chrono",
  "clap",
