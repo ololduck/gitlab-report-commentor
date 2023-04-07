@@ -24,7 +24,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.64.0
+          - 1.65.0
         target:
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
@@ -47,7 +47,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.64.0
+          - 1.65.0
         target:
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
@@ -70,7 +70,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.64.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -91,7 +90,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.64.0
+          - 1.65.0
         target:
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
